@@ -61,30 +61,6 @@ nodeTree *addType(nodeTree *parent, char jenis[])
     return newNode;
 }
 
-nodeTree *findType(nodeTree *root, char jenis[])
-{
-    if (root == NULL)
-    {
-        printf("Belum ada jenis kendaraan yang terdaftar!");
-        return NULL;
-    }
-    if (strcmp(jenis, root->jenis) == 0)
-    {
-        return root;
-    }
-    nodeTree *current = root->firstChild;
-    while (current != NULL)
-    {
-        nodeTree *result = findType(current, jenis);
-        if (result != NULL)
-        {
-            return result;
-        }
-        current = current->nextSibling;
-    }
-    return NULL;
-}
-
 nodeLL *createListNode(int nomorSeri, char pemilik[], char merk[], int tahunPembuatan)
 {
     nodeLL *newNode = (nodeLL *)malloc(sizeof(nodeLL));
@@ -142,6 +118,19 @@ void printAllData(nodeTree *root)
         while (current != NULL)
         {
             printAllData(current);
+            current = current->nextSibling;
+        }
+    }
+}
+void printSpecifiedData(nodeTree *parent)
+{
+    if (parent != NULL)
+    {
+        printf("%s\n", parent->jenis);
+        nodeTree *current = parent->nextSibling;
+        while (current != NULL)
+        {
+            printSpecifiedData(current);
             current = current->nextSibling;
         }
     }
@@ -245,30 +234,37 @@ int main(int argc, char const *argv[])
             }
             break;
         case 2:
-            printf("Jenis kendaraan terdaftar : \n");
-            for (int i = 0; i < indexType + 1; i++)
+            if (indexType == -1)
             {
-                printf("%d- %s\n", i + 1, type[i]);
-            }
-            printf("Pilih jenis (angka) : ");
-            scanf("%d", &selectedIndex);
-            if (selectedIndex > indexType + 1)
-            {
-                printf("Keluar dari batasan!\n");
+                printf("Belum ada jenis kendaraan!\n");
             }
             else
             {
-                printf("Nomor Seri : ");
-                scanf("%d", &nomorSeri);
-                printf("Pemilik : ");
-                scanf("%s", pemilik);
-                printf("Merk : ");
-                scanf("%s", merk);
-                printf("Tahun Pembuatan : ");
-                scanf("%d", &tahunPembuatan);
-                addData(&(type[selectedIndex - 1]->linkedListHead), nomorSeri, pemilik, merk, tahunPembuatan);
-            }
 
+                printf("Jenis kendaraan terdaftar : \n");
+                for (int i = 0; i < indexType + 1; i++)
+                {
+                    printf("%d- %s\n", i + 1, type[i]);
+                }
+                printf("Pilih jenis (angka) : ");
+                scanf("%d", &selectedIndex);
+                if (selectedIndex > indexType + 1)
+                {
+                    printf("Keluar dari batasan!\n");
+                }
+                else
+                {
+                    printf("Nomor Seri : ");
+                    scanf("%d", &nomorSeri);
+                    printf("Pemilik : ");
+                    scanf("%s", pemilik);
+                    printf("Merk : ");
+                    scanf("%s", merk);
+                    printf("Tahun Pembuatan : ");
+                    scanf("%d", &tahunPembuatan);
+                    addData(&(type[selectedIndex - 1]->linkedListHead), nomorSeri, pemilik, merk, tahunPembuatan);
+                }
+            }
             break;
         case 3:
             printAllData(root);
@@ -277,22 +273,25 @@ int main(int argc, char const *argv[])
             printTree(root, 0);
             break;
         case 5:
-            printf("Klasifikasi : \n");
-            for (int i = 0; i < indexKlasifikasi + 1; i++)
+            if (indexType == -1)
             {
-                printf("%d- %s\n", i + 1, Klasifikasi[i]);
+                printf("Tidak ada data yang bisa ditampilkan!\n");
             }
-            printf("Pilih klasifikasi (angka) : ");
-            scanf("%d", &selectIndexKlasifikasi);
+            else
+            {
+                printf("Klasifikasi : \n");
+                for (int i = 0; i < indexKlasifikasi + 1; i++)
+                {
+                    printf("%d- %s\n", i + 1, Klasifikasi[i]);
+                }
+                printf("Pilih klasifikasi (angka) : ");
+                scanf("%d", &selectIndexKlasifikasi);
 
-            printf("Jenis kendaraan terdaftar : \n");
-            for (int i = 0; i < indexType + 1; i++)
-            {
-                printf("%d- %s\n", i + 1, type[i]);
+                printf("Jenis kendaraan terdaftar : \n");
+                printSpecifiedData(Klasifikasi[selectIndexKlasifikasi - 1]->firstChild);
+                printf("Pilih jenis (string): ");scanf("%s", jenis);
+                printSpecifiedType(Klasifikasi[selectIndexKlasifikasi - 1], jenis);
             }
-            printf("Pilih jenis (angka) : ");
-            scanf("%d", &selectedIndex);
-            printSpecifiedType(Klasifikasi[selectIndexKlasifikasi - 1], type[selectedIndex - 1]->jenis);
             break;
         case 0:
             exit(1);
