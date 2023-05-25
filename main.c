@@ -168,20 +168,40 @@ void printSpecifiedType(nodeTree *root, char jenis[])
         }
     }
 }
+
+void printTree(nodeTree *root, int level)
+{
+    if (root == NULL)
+    {
+        return;
+    }
+
+    for (int i = 0; i < level; i++)
+    {
+        printf("-");
+    }
+
+    printf("%s \n", root->jenis);
+
+    printTree(root->firstChild, level + 1);
+    printTree(root->nextSibling, level);
+}
+
 int main(int argc, char const *argv[])
 {
     char jenis[20], pemilik[20], merk[20];
-    int menu, index = 0, nomorSeri, tahunPembuatan, selectedIndex;
-    nodeTree *type[10];
+    int menu, indexType = -1, nomorSeri, tahunPembuatan, selectedIndex, indexKlasifikasi = -1, pilih, selectIndexKlasifikasi;
+    nodeTree *type[10], *Klasifikasi[5];
     nodeTree *root = createTreeNode("Kendaraan");
     do
     {
         system("cls");
         printf("-----Menu-----\n");
-        printf("[1] Masukkan jenis kendaraan\n");
+        printf("[1] Tambah Klasifikasi kendaraan\n");
         printf("[2] Tambah data\n");
         printf("[3] Lihat semua data\n");
-        printf("[4] Lihat data tertentu\n");
+        printf("[4] Lihat klasifikasi\n");
+        printf("[5] Lihat data tertentu\n");
         printf("[0] Exit\n");
         printf("Pilih menu : ");
         scanf("%d", &menu);
@@ -189,42 +209,90 @@ int main(int argc, char const *argv[])
         switch (menu)
         {
         case 1:
+            printf("Masukkan berdasarkan : \n");
+            printf("[1] Tempat operasional\n");
+            printf("[2] Jenis / Tipe Kendaraan\n");
+            printf(">> ");
+            scanf("%d", &pilih);
             printf("Masukkan jenis kendaraan : ");
             scanf("%s", jenis);
-            nodeTree *newNode = addType(root, jenis);
-            type[index] = newNode;
-            index++;
+            if (pilih == 1)
+            {
+                nodeTree *newNode = addType(root, jenis);
+                Klasifikasi[++indexKlasifikasi] = newNode;
+            }
+            else if (pilih == 2)
+            {
+                if (indexKlasifikasi == -1)
+                {
+                    printf("Klasifikasi belum ada!\n");
+                }
+                else
+                {
+                    for (int i = 0; i < indexKlasifikasi + 1; i++)
+                    {
+                        printf("%d- %s\n", i + 1, Klasifikasi[i]);
+                    }
+                    printf("Pilih klasifikasi : ");
+                    scanf("%d", &selectedIndex);
+                    nodeTree *newNode = addType(Klasifikasi[selectedIndex - 1], jenis);
+                    type[++indexType] = newNode;
+                }
+            }
+            else
+            {
+                printf("Input tidak sesuai!\n");
+            }
             break;
         case 2:
             printf("Jenis kendaraan terdaftar : \n");
-            for (int i = 0; i < index; i++)
+            for (int i = 0; i < indexType + 1; i++)
             {
                 printf("%d- %s\n", i + 1, type[i]);
             }
             printf("Pilih jenis (angka) : ");
             scanf("%d", &selectedIndex);
-            printf("Nomor Seri : ");
-            scanf("%d", &nomorSeri);
-            printf("Pemilik : ");
-            scanf("%s", pemilik);
-            printf("Merk : ");
-            scanf("%s", merk);
-            printf("Tahun Pembuatan : ");
-            scanf("%d", &tahunPembuatan);
-            addData(&(type[selectedIndex - 1]->linkedListHead), nomorSeri, pemilik, merk, tahunPembuatan);
+            if (selectedIndex > indexType + 1)
+            {
+                printf("Keluar dari batasan!\n");
+            }
+            else
+            {
+                printf("Nomor Seri : ");
+                scanf("%d", &nomorSeri);
+                printf("Pemilik : ");
+                scanf("%s", pemilik);
+                printf("Merk : ");
+                scanf("%s", merk);
+                printf("Tahun Pembuatan : ");
+                scanf("%d", &tahunPembuatan);
+                addData(&(type[selectedIndex - 1]->linkedListHead), nomorSeri, pemilik, merk, tahunPembuatan);
+            }
+
             break;
         case 3:
             printAllData(root);
             break;
         case 4:
+            printTree(root, 0);
+            break;
+        case 5:
+            printf("Klasifikasi : \n");
+            for (int i = 0; i < indexKlasifikasi + 1; i++)
+            {
+                printf("%d- %s\n", i + 1, Klasifikasi[i]);
+            }
+            printf("Pilih klasifikasi (angka) : ");
+            scanf("%d", &selectIndexKlasifikasi);
+
             printf("Jenis kendaraan terdaftar : \n");
-            for (int i = 0; i < index; i++)
+            for (int i = 0; i < indexType + 1; i++)
             {
                 printf("%d- %s\n", i + 1, type[i]);
             }
             printf("Pilih jenis (angka) : ");
             scanf("%d", &selectedIndex);
-            printSpecifiedType(root, type[selectedIndex - 1]->jenis);
+            printSpecifiedType(Klasifikasi[selectIndexKlasifikasi - 1], type[selectedIndex - 1]->jenis);
             break;
         case 0:
             exit(1);
